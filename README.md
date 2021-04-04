@@ -18,3 +18,4 @@ An utility that allows you to convert .lrc files to XML which can be used with [
 
 - You will need to convert the lyrics manually to kana (it can be romanized automatically for the `<word>` output, the original kana will be left in `<nihongoword>`)
 - You will need to manually add the xml to your IshoTyping/Typing Mania folder and include it in its respective list xml
+- The tool is **made for IshoTyping**, but it can be used with Typing Mania with a few modifications of which you'll have to take care manually
