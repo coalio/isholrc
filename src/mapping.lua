@@ -1,8 +1,8 @@
 -- Transliterates kana to a romaji standard
 
-local utf8 = require('src.libs.utf8.utf8')
+utf8 = require('src.libs.utf8.utf8')
 
-local mapping = {
+mapping = {
     map = require('src.data.hepburn'),
     buffer = {
         caret = 0,
@@ -24,11 +24,26 @@ setmetatable(mapping.buffer, {
     end
 });
 
+-- Ranges allowed:
+-- 32: space
+-- 65 - 90: upper-case ASCII roman letters
+-- 97 - 122: lower-case ASCII roman letters
+-- 0x3041 - 0x3093: UCS/Unicode 16-bit code range for hiragana 
+function mapping:clean(input)
+    return utf8.gsub(input, '.', function(character)
+        local charcode = utf8.unicode(character)
+        local in_range = 
+            (charcode == 32)                     or
+            (charcode >= 65 and charcode <= 90)  or 
+            (charcode >= 97 and charcode <= 122) or 
+            (charcode >= 0x3041 and charcode <= 0x3093)
+            
+        return in_range and character or ''
+    end)
+end
 function mapping:transliterate(input)
     -- Read and convert
     local substring
-    local move_caret = 0
-
     for caret = 1, utf8.len(input), 2 do
         substring = utf8.sub(input, caret, 1 + caret)
         if substring == '' then break end
@@ -37,9 +52,9 @@ function mapping:transliterate(input)
             self.buffer:append(self.map[substring])
         else
             for i = 1, 2 do
-                local digraph = utf8.sub(substring, i, i)
-                if digraph == "ー" then digraph = self.buffer.content:sub(-1, -1) end
-                self.buffer:append(self.map[digraph] or digraph)
+                local character = utf8.sub(substring, i, i)
+                if character == "ー" then character = self.buffer.content:sub(-1, -1) end
+                self.buffer:append(self.map[character] or character)
             end
         end
     end
