@@ -1,9 +1,9 @@
 -- Transliterates kana to a romaji standard
 
-utf8 = require('src.libs.utf8.utf8')
+utf8 = require('libs.utf8.utf8')
 
 mapping = {
-    map = require('src.data.hepburn'),
+    map = require('data.hepburn'),
     buffer = {
         caret = 0,
         content = '',
@@ -53,7 +53,16 @@ function mapping:transliterate(input)
         else
             for i = 1, 2 do
                 local character = utf8.sub(substring, i, i)
-                if character == "ー" then character = self.buffer.content:sub(-1, -1) end
+                if character == 'ー' then
+                    -- long vowel dash
+                    local vowel = self.buffer.content:sub(-1, -1)
+                    character = vowel == 'e' and 'i' or vowel -- えい
+                end
+                if character == 'ッ' then
+                    -- extend consonant
+                    local consonant = self.map[utf8.sub(input, caret + 2, caret + 2)]
+                    character = consonant and consonant:sub(1,1) or ''
+                end
                 self.buffer:append(self.map[character] or character)
             end
         end
@@ -62,4 +71,5 @@ function mapping:transliterate(input)
     return self.buffer()
 end
 
+print(mapping:transliterate('かんがえ すぎ の メッセージ'))
 return mapping
