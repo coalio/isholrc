@@ -71,5 +71,4 @@ function mapping:transliterate(input)
     return self.buffer()
 end
 
-print(mapping:transliterate('かんがえ すぎ の メッセージ'))
 return mapping
